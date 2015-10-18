@@ -1,4 +1,9 @@
-# Reproducible Research: Peer Assessment 1
+---
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+  html_document:
+    keep_md: true
+---
 
 
 ## Loading and preprocessing the data 
@@ -15,13 +20,6 @@ activityMonitor <- read.csv("activity.csv")
 ```r
 # Create datetime field
 library(lubridate)
-```
-
-```
-## Warning: package 'lubridate' was built under R version 3.2.2
-```
-
-```r
 datetime <- strptime( paste(activityMonitor$date, sprintf("%.2f", activityMonitor$interval/100)), "%Y-%m-%d %H.%M")
 activityMonitor <- cbind( activityMonitor, datetime)
 activityMonitor$TimeInterval <- hm(format(activityMonitor$datetime, '%H:%M'))
@@ -41,7 +39,7 @@ stepsByDay <- aggregate( steps ~ date, data = activityMonitor, sum )
 hist(stepsByDay$steps, labels = TRUE, ylim = c(0,30), xlab = "Steps per Day",ylab = "Num of Days",  main = "Histogram of Total Steps per Day")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4-1.png) 
 
 #### 3. Calculate and report the mean and median total number of steps taken per day
 
@@ -62,7 +60,7 @@ avgStepsByInt <-  aggregate( steps ~ interval, data = activityMonitor, mean )
 plot(x = avgStepsByInt$interval, y = avgStepsByInt$steps, type = 'l', xlab = 'Interval', ylab = 'Avg Steps', main = 'Average Steps per Interval')
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png) 
 
 #### 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
@@ -102,18 +100,6 @@ Use the Average Steps per interval over the complete dataset to fill in NA value
 impActivityMonitor <- merge(activityMonitor, avgStepsByInt, by = 'interval', all = TRUE)  
 impActivityMonitor <- transform(impActivityMonitor, ImputedSteps = ifelse(is.na(impActivityMonitor$steps.x), impActivityMonitor$steps.y, impActivityMonitor$steps.x))
 library(plyr)
-```
-
-```
-## 
-## Attaching package: 'plyr'
-## 
-## The following object is masked from 'package:lubridate':
-## 
-##     here
-```
-
-```r
 impActivityMonitor <- arrange(impActivityMonitor, datetime)
 ```
 
@@ -124,7 +110,7 @@ impStepsByDay <- aggregate( ImputedSteps ~ date, data = impActivityMonitor, sum 
 hist(impStepsByDay$ImputedSteps, labels = TRUE, ylim = c(0,40), xlab = "Steps per Day",ylab = "Num of Days",  main = "Histogram of Total Imputed Steps\nper Day")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-10-1.png) 
+![plot of chunk unnamed-chunk-10](figure/unnamed-chunk-10-1.png) 
 
 ```r
 impStepSummary <- c(mean = mean(impStepsByDay$ImputedSteps), median = median(impStepsByDay$ImputedSteps))
@@ -157,13 +143,6 @@ activityMonitor$weekday <- factor(activityMonitor$weekday, levels = c('weekend',
 avgStepsIntbyWeekday <-  aggregate( steps ~ interval + weekday, data = activityMonitor, mean )
 
 library(ggplot2)
-```
-
-```
-## Warning: package 'ggplot2' was built under R version 3.2.2
-```
-
-```r
 g <- ggplot(avgStepsIntbyWeekday, aes( x = interval, y = steps) )
 g + facet_grid(weekday ~ .) +
   geom_line() +
@@ -171,4 +150,4 @@ g + facet_grid(weekday ~ .) +
   ggtitle("Average Interval steps\nby weekday") 
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-12-1.png) 
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png) 
